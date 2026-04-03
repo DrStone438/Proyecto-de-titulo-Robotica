@@ -1,111 +1,59 @@
 #include <Arduino.h>
 
-#define Motor1A 2
-#define Motor1B 3
-#define Motor2A 4
-#define Motor2B 5
-#define Motor3A 6
-#define Motor3B 7
-#define Motor4A 8
-#define Motor4B 9
-
+// Definición de pines (Uso de arreglos para escalabilidad)
+const int pinesMotores[] = {2, 3, 4, 5, 6, 7, 8, 9};
 
 void setup() {
-  pinMode(Motor1A, OUTPUT);
-  pinMode(Motor1B, OUTPUT);
-  pinMode(Motor2A, OUTPUT);
-  pinMode(Motor2B, OUTPUT);
-  pinMode(Motor3A, OUTPUT);
-  pinMode(Motor3B, OUTPUT);
-  pinMode(Motor4A, OUTPUT);
-  pinMode(Motor4B, OUTPUT);
-
+  for (int i = 0; i < 8; i++) {
+    pinMode(pinesMotores[i], OUTPUT);
+  }
+  
   Serial.begin(9600);
-  Serial.println("Listo para recibir comandos");
+  Serial.println("Sistema listo. Use W, A, S, D para mover y Q para detener.");
 }
 
-void Avanzar(){
-  digitalWrite(Motor1A, HIGH);
-  digitalWrite(Motor1B, LOW);
-  digitalWrite(Motor2A, LOW);
-  digitalWrite(Motor2B, HIGH);
-  digitalWrite(Motor3A, HIGH);
-  digitalWrite(Motor3B, LOW);
-  digitalWrite(Motor4A, LOW);
-  digitalWrite(Motor4B, HIGH);
-  Serial.println("Avanzar");
-}
-
-void Detener(){
-  digitalWrite(Motor1A, LOW);
-  digitalWrite(Motor1B, LOW);
-  digitalWrite(Motor2A, LOW);
-  digitalWrite(Motor2B, LOW);
-  digitalWrite(Motor3A, LOW);
-  digitalWrite(Motor3B, LOW);
-  digitalWrite(Motor4A, LOW);
-  digitalWrite(Motor4B, LOW);
-  Serial.println("Detenido");
-}
-
-void Retroceder(){
-  digitalWrite(Motor1A, LOW);
-  digitalWrite(Motor1B, HIGH);
-  digitalWrite(Motor2A, HIGH);
-  digitalWrite(Motor2B, LOW);
-  digitalWrite(Motor3A, LOW);
-  digitalWrite(Motor3B, HIGH);
-  digitalWrite(Motor4A, HIGH);
-  digitalWrite(Motor4B, LOW);
-  Serial.println("Retrocediendo");
-}
-
-void Derecha(){
-  digitalWrite(Motor1A, LOW);
-  digitalWrite(Motor1B, HIGH);
-  digitalWrite(Motor2A, LOW);
-  digitalWrite(Motor2B, HIGH);
-  digitalWrite(Motor3A, LOW);
-  digitalWrite(Motor3B, HIGH);
-  digitalWrite(Motor4A, LOW);
-  digitalWrite(Motor4B, HIGH);
-  Serial.println("Girando a la Derecha");
-}
-
-void Izquierda(){
-  digitalWrite(Motor1A, HIGH);
-  digitalWrite(Motor1B, LOW);
-  digitalWrite(Motor2A, HIGH);
-  digitalWrite(Motor2B, LOW);
-  digitalWrite(Motor3A, HIGH);
-  digitalWrite(Motor3B, LOW);
-  digitalWrite(Motor4A, HIGH);
-  digitalWrite(Motor4B, LOW);
-  Serial.println("Girando Izquierda");
+// Función maestra para controlar los motores
+// Permite enviar los 8 estados de un solo golpe
+void controlarMotores(bool m1a, bool m1b, bool m2a, bool m2b, bool m3a, bool m3b, bool m4a, bool m4b) {
+  digitalWrite(2, m1a); digitalWrite(3, m1b);
+  digitalWrite(4, m2a); digitalWrite(5, m2b);
+  digitalWrite(6, m3a); digitalWrite(7, m3b);
+  digitalWrite(8, m4a); digitalWrite(9, m4b);
 }
 
 void loop() {
   if (Serial.available() > 0) {
     char tecla = Serial.read();
 
-    if (tecla == 'w') {
-      Avanzar();
-    }
+    switch (tolower(tecla)) { // tolower permite que funcione con 'W' o 'w'
+      case 'w':
+        controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH);
+        Serial.println("Estado: Avanzar");
+        break;
+        
+      case 's':
+        controlarMotores(LOW, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW);
+        Serial.println("Estado: Retroceder");
+        break;
+        
+      case 'a':
+        controlarMotores(HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW);
+        Serial.println("Estado: Girar Izquierda");
+        break;
+        
+      case 'd':
+        controlarMotores(LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH);
+        Serial.println("Estado: Girar Derecha");
+        break;
+        
+      case 'q':
+        controlarMotores(LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW);
+        Serial.println("Estado: Detenido");
+        break;
 
-    if (tecla == 'q') {
-      Detener();
-    }
-
-    if (tecla == 's') {
-      Retroceder();
-    }
-
-    if (tecla == 'd') {
-      Derecha();
-    }
-
-    if (tecla == 'a') {
-      Izquierda();
+      default:
+        // Opcional: ignorar saltos de línea o caracteres extraños
+        break;
     }
   }
 }
