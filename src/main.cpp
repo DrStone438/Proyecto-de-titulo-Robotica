@@ -21,37 +21,49 @@ void controlarMotores(bool m1a, bool m1b, bool m2a, bool m2b, bool m3a, bool m3b
   digitalWrite(12, m4a); digitalWrite(13, m4b); analogWrite(9, m4p);
 }
 void ControlTeclado(){
+  int velAlta = 140;
+  int velBaja = 80; // Velocidad reducida para las ruedas interiores en un giro
   if (Serial.available() > 0) {
     char tecla = Serial.read();
-
-    switch (tolower(tecla)) { // tolower permite que funcione con 'W' o 'w'
-      case 'w':
-        controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH, 127, 127, 127, 127);
+    switch (tolower(tecla)) {
+      case 'w': // AVANZAR
+        controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH, velAlta, velAlta, velAlta, velAlta);
         Serial.println("Estado: Avanzar");
         break;
         
-      case 's':
-        controlarMotores(LOW, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW, 127, 127, 127, 127);
+      case 's': // RETROCEDER
+        controlarMotores(LOW, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW, velAlta, velAlta, velAlta, velAlta);
         Serial.println("Estado: Retroceder");
         break;
-        
-      case 'a':
-        controlarMotores(HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, 127, 127, 127, 127);
-        Serial.println("Estado: Girar Izquierda");
-        break;
-        
-      case 'd':
-        controlarMotores(LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, 127, 127, 127, 127);
-        Serial.println("Estado: Girar Derecha");
-        break;
-        
-      case 'q':
-        controlarMotores(LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, 0, 0, 0, 0);
-        Serial.println("Estado: Detenido");
+
+      case 'q': // AVANZAR HACIA LA IZQUIERDA (Giro abierto)
+        // Motores derechos a tope, izquierdos lentos
+        controlarMotores(HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, velAlta, velAlta, velAlta, velAlta);
+        delay(50);
+        controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH, velAlta, velAlta, velAlta, velAlta);
+        delay(100);
+        Serial.println("Estado: Avanzar Izquierda");
         break;
 
-      default:
-        // Opcional: ignorar saltos de línea o caracteres extraños
+      case 'e': // AVANZAR HACIA LA DERECHA (Giro abierto)
+        // Motores izquierdos a tope, derechos lentos
+        controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH, velBaja, velAlta, velBaja, velAlta);
+        Serial.println("Estado: Avanzar Derecha");
+        break;
+        
+      case 'a': // GIRAR IZQUIERDA (Sobre su eje)
+        controlarMotores(HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, velAlta, velAlta, velAlta, velAlta);
+        Serial.println("Estado: Rotar Izquierda");
+        break;
+        
+      case 'd': // GIRAR DERECHA (Sobre su eje)
+        controlarMotores(LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, velAlta, velAlta, velAlta, velAlta);
+        Serial.println("Estado: Rotar Derecha");
+        break;
+      
+      case ' ': // ESPACIO PARA DETENER
+        controlarMotores(LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, 0, 0, 0, 0);
+        Serial.println("Estado: DETENIDO (Freno)");
         break;
     }
   }
