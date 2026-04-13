@@ -36,19 +36,18 @@ void ControlTeclado(){
         Serial.println("Estado: Retroceder");
         break;
 
-      case 'q': // AVANZAR HACIA LA IZQUIERDA (Giro abierto)
-        // Motores derechos a tope, izquierdos lentos
-        controlarMotores(HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, velAlta, velAlta, velAlta, velAlta);
-        delay(50);
-        controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH, velAlta, velAlta, velAlta, velAlta);
-        delay(100);
-        Serial.println("Estado: Avanzar Izquierda");
-        break;
-
-      case 'e': // AVANZAR HACIA LA DERECHA (Giro abierto)
-        // Motores izquierdos a tope, derechos lentos
+      case 'q': // CURVA HACIA LA IZQUIERDA (Giro Diferencial)
+        // Todos los motores apuntan hacia adelante. 
+        // Lado izquierdo (M1, M3) a velBaja. Lado derecho (M2, M4) a velAlta.
         controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH, velBaja, velAlta, velBaja, velAlta);
-        Serial.println("Estado: Avanzar Derecha");
+        Serial.println("Estado: Curva Suave Izquierda");
+        break;  
+
+      case 'e': // CURVA HACIA LA DERECHA (Giro Diferencial)
+        // Todos los motores apuntan hacia adelante.
+        // Lado izquierdo (M1, M3) a velAlta. Lado derecho (M2, M4) a velBaja.
+        controlarMotores(HIGH, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH, velAlta, velBaja, velAlta, velBaja);
+        Serial.println("Estado: Curva Suave Derecha");
         break;
         
       case 'a': // GIRAR IZQUIERDA (Sobre su eje)
@@ -56,9 +55,9 @@ void ControlTeclado(){
         Serial.println("Estado: Rotar Izquierda");
         break;
         
-      case 'd': // GIRAR DERECHA (Sobre su eje)
+      case 'd': // GIRAR DERECHA (Sobre su eje - Lados en direcciones opuestas)
         controlarMotores(LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, velAlta, velAlta, velAlta, velAlta);
-        Serial.println("Estado: Rotar Derecha");
+        Serial.println("Estado: Rotar Derecha en el eje");
         break;
       
       case ' ': // ESPACIO PARA DETENER
